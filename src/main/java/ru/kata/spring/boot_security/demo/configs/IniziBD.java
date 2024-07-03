@@ -1,50 +1,35 @@
 package ru.kata.spring.boot_security.demo.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class IniziBD {
-    private UserService userService;
-    private RoleRepository roleRepository;
+    private final UserService userService;
 
 
-    @Autowired
-    public IniziBD(UserService userService, RoleRepository roleRepository) {
+    public IniziBD(UserService userService) {
         this.userService = userService;
-        this.roleRepository = roleRepository;
     }
 
     @PostConstruct
-    @Transactional
     public void initializeUsers() {
-        Role adminRole = new Role();
-        adminRole.setRoleName("ROLE_ADMIN");
-        roleRepository.save(adminRole);
+        User user = userService.findByEmail("admin@mail.ru");
+        if (user == null) {
+            Role userRole = new Role("ROLE_USER");
+            Role adminRole = new Role("ROLE_ADMIN");
+            List<Role> adminRoles = new ArrayList<>();
+            adminRoles.add(userRole);
+            adminRoles.add(adminRole);
+            User admin = new User(adminRoles, "ali", "tutu",20L, "admin@mail.ru", "admin");
 
-        Role userRole = new Role();
-        userRole.setRoleName("ROLE_USER");
-        roleRepository.save(userRole);
-
-        Set<Role> adminRoles = new HashSet<>();
-        adminRoles.add(adminRole);
-        adminRoles.add(userRole);
-        User adminUser = new User("ali","tutu", 20L, "11", "11",adminRoles);
-
-        userService.save(adminUser);
-
-        Set<Role> userRoles = new HashSet<>();
-        userRoles.add(userRole);
-        User regularUser = new User("turpal","tutu", 23L, "22", "22",userRoles);        regularUser.setRoles(userRoles);
-        userService.save(regularUser);
+            userService.save(admin);
+        }
     }
 }

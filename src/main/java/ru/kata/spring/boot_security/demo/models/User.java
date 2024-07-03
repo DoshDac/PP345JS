@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,24 +34,30 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "users_roles",
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> roles;
 
-    public User(String firstName, String lastName, Long age, String email, String password, Set<Role> roles) {
-
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.age = age;
-        this.email = email;
-        this.password = password;
-        this.roles = roles;
-    }
-
+//    public User(String firstName, String lastName, Long age, String email, String password, Set<Role> roles) {
+//
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.age = age;
+//        this.email = email;
+//        this.password = password;
+//        this.roles = roles;
+//    }
+public User(List<Role> roles, String firstName, String lastName, Long age, String email, String password) {
+    this.roles = roles;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.age = age;
+    this.email = email;
+    this.password = password;
+}
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();

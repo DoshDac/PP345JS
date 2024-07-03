@@ -29,31 +29,32 @@ public class UserServiceImp implements UserService {
         this.roleRepository = roleRepository;
     }
 
+    @Transactional(readOnly = true)
+    public List<User> listAll() {
+        return userRepository.findAll();
+    }
+
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException(String.format("User '%s' not found", email));
+            throw new UsernameNotFoundException(String.format("User with email address '%s' not found", email));
         }
         return user;
     }
 
+    @Transactional(readOnly = true)
+    public User getById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
     @Transactional
-    @Override
     public void save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.saveAndFlush(user);
     }
 
-    public List<User> showUsers() {
-        return userRepository.findAll();
-    }
-
-    public User getUser(Long id) {
-        return userRepository.getById(id);
-    }
 
     @Transactional
     public void delete(Long id) {
@@ -66,7 +67,7 @@ public class UserServiceImp implements UserService {
         save(user);
     }
 
-
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

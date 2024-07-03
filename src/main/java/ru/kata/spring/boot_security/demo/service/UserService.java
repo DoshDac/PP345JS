@@ -12,11 +12,11 @@ public interface UserService extends UserDetailsService {
     @Override
     UserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
 
-    List<User> showUsers();
+    List<User> listAll();
+
+    User getById(Long id);
 
     void save(User user);
-
-    User getUser(Long id);
 
     void delete(Long id);
 
